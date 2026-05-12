@@ -52,6 +52,7 @@
     doctrineGap: document.getElementById("doctrineGap"),
     doctrineGapTitle: document.getElementById("doctrineGapTitle"),
     doctrineGapBody: document.getElementById("doctrineGapBody"),
+    sensitivityList: document.getElementById("sensitivityList"),
     qualificationTrigger: document.getElementById("qualificationTrigger"),
     supplyChainRisk: document.getElementById("supplyChainRisk"),
     runMoment: document.getElementById("runMoment"),
@@ -161,6 +162,41 @@
     });
     const readiness = n ? Math.round((sum / n) * 100) : 0;
     return { readiness, blocked, gap: readiness - 100 };
+  }
+
+  /* Sensitivity: for each block currently below Verified, how many readiness
+     points would we gain by closing it (forcing it to Verified)? */
+  function sensitivity(phaseKey, stepIndex) {
+    const weights = data.measures.scoreWeights;
+    let total = 0;
+    const rows = [];
+    const flat = [];
+    data.tools.forEach((tool) => {
+      tool.blocks.forEach((block) => {
+        const s = effectiveScore(phaseKey, block, stepIndex);
+        total += 1;
+        flat.push({ tool, block, score: s, weight: weights[s] ?? 0 });
+      });
+    });
+    if (total === 0) return [];
+    const baseSum = flat.reduce((a, b) => a + b.weight, 0);
+    const baseReadiness = Math.round((baseSum / total) * 100);
+    flat.forEach(({ tool, block, score, weight }) => {
+      if (score === "Verified") return;
+      const newSum = baseSum - weight + (weights.Verified ?? 1);
+      const newReadiness = Math.round((newSum / total) * 100);
+      rows.push({
+        toolId: tool.id,
+        toolLabel: tool.label,
+        blockTitle: block.title,
+        score,
+        delta: newReadiness - baseReadiness,
+        owner: block.owner,
+        recoveryAction: block.recoveryAction
+      });
+    });
+    rows.sort((a, b) => b.delta - a.delta);
+    return rows;
   }
 
   /* Asks queue: enumerate decisions the director still owes a signature on. */
@@ -317,6 +353,35 @@
     });
   }
 
+  function renderSensitivity(phaseKey) {
+    if (!els.sensitivityList) return;
+    clearChildren(els.sensitivityList);
+    const rows = sensitivity(phaseKey).slice(0, 3);
+    if (rows.length === 0) {
+      const li = document.createElement("li");
+      li.className = "sensitivity-empty";
+      li.textContent = "All blocks at Verified — no closure would raise readiness.";
+      els.sensitivityList.appendChild(li);
+      return;
+    }
+    rows.forEach((row) => {
+      const li = document.createElement("li");
+      li.className = `sensitivity-item ${classForScore(row.score)}`;
+      li.innerHTML = `
+        <span class="sens-delta">+${row.delta}%</span>
+        <strong>${row.toolLabel}</strong>
+        <small>${row.blockTitle} · ${row.score} · ${row.owner}</small>
+      `;
+      li.addEventListener("click", () => {
+        state.selectedToolId = row.toolId;
+        state.selectedBlockTitle = row.blockTitle;
+        state.cleared = false;
+        renderSelection();
+      });
+      els.sensitivityList.appendChild(li);
+    });
+  }
+
   function renderDoctrineGap(phaseKey) {
     if (!els.doctrineGap) return;
     const gap = data.doctrineGaps.find((g) => g.phase === phaseKey);
@@ -408,6 +473,7 @@
     renderGate(block, score);
     renderPackages(phaseKey);
     renderAsksQueue(phaseKey);
+    renderSensitivity(phaseKey);
     renderDoctrineGap(phaseKey);
     renderExecutiveAsk(phaseKey);
   }
