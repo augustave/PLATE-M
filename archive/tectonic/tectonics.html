@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PLATE Release Chronograph</title>
+    <link rel="stylesheet" href="tectonics.css">
+  </head>
+  <body>
+    <main class="chronograph-app" aria-label="PLATE tooling release chronograph">
+      <header class="index-header">
+        <a class="mark" href="tectonics.html" aria-label="PLATE release chronograph home">PLATE</a>
+        <div class="title-block">
+          <p class="micro">Aerospace tooling release authority / synthetic demo</p>
+          <h1>Release Chronograph</h1>
+        </div>
+        <nav class="mode-nav" aria-label="PLATE product modes">
+          <a class="active" href="tectonics.html">Release Chronograph</a>
+          <a href="moment.html">Surge Moment</a>
+        </nav>
+        <div class="index-metrics" aria-label="Readiness metrics">
+          <div>
+            <span>Readiness</span>
+            <strong id="metricReadiness">82</strong>
+          </div>
+          <div>
+            <span>Blocked</span>
+            <strong id="metricBlocked">01</strong>
+          </div>
+          <div>
+            <span>Takt Gap</span>
+            <strong id="metricGap">-18%</strong>
+          </div>
+        </div>
+      </header>
+
+      <section class="control-band" aria-label="Phase and simulation controls">
+        <div class="phase-tabs" id="phaseTabs"></div>
+        <div class="plotter-controls">
+          <button type="button" id="runPlotter">Run Plotter</button>
+          <button type="button" id="pausePlotter">Pause</button>
+          <button type="button" id="stepPlotter">Step</button>
+          <button type="button" id="resetPlotter">Reset</button>
+          <button type="button" id="memoToggle">Release Memo</button>
+        </div>
+        <div class="agent-strip" id="agentStrip" aria-label="Simulation agents"></div>
+        <div class="board-register" aria-label="Board pan and scenario register">
+          <span id="scrollWindow">Window LRIP +00 to +06 WK</span>
+          <strong id="scenarioNote">Baseline posture isolates packages with traceable datum continuity and current-rate serviceability.</strong>
+        </div>
+      </section>
+
+      <section class="chronograph" aria-label="Chronological tooling evidence">
+        <aside class="lane-index" aria-label="Tooling taxonomy">
+          <div class="ghost-taxonomy" aria-hidden="true">TOOLING</div>
+          <div class="lane-index-head">
+            <span>Lane</span>
+            <span>Datum</span>
+          </div>
+          <div id="laneIndexRows"></div>
+        </aside>
+
+        <div class="timeline-viewport" id="timelineViewport" tabindex="0" aria-label="Scrollable release timeline">
+          <div class="pan-label pan-left" id="panLeft" aria-hidden="true">PAN LEFT</div>
+          <div class="pan-label pan-right" id="panRight" aria-hidden="true">PAN RIGHT</div>
+          <div class="timeline-canvas" id="timelineCanvas">
+            <div class="time-axis" id="timeAxis"></div>
+            <div class="guide-line" id="guideLine" aria-hidden="true"></div>
+            <div id="laneRows"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="detail-register" aria-label="Selected release evidence">
+        <div class="register-section primary-register">
+          <p class="micro">Selected Evidence</p>
+          <div class="register-title-row">
+            <h2 id="detailTitle">Assembly Jig / Datum Continuity</h2>
+            <span class="status-label cobalt" id="detailScore">Verified</span>
+          </div>
+          <p id="detailBody">Design datum A/B/C remains traceable through hard stops and tracker frame.</p>
+          <div class="register-actions">
+            <a id="momentLink" href="moment.html">Open Moment</a>
+          </div>
+        </div>
+        <div class="register-section">
+          <p class="micro">CoVe Claim</p>
+          <strong id="detailClaim">Tool preserves design datum intent.</strong>
+        </div>
+        <div class="register-section">
+          <p class="micro">Evidence Method</p>
+          <strong id="detailEvidence">Tracker-frame alignment check against hard-stop baseline.</strong>
+        </div>
+        <div class="register-section">
+          <p class="micro">Missing Evidence</p>
+          <strong id="detailMissing">No release-blocking evidence gap logged.</strong>
+        </div>
+        <div class="register-section">
+          <p class="micro">Recovery</p>
+          <strong id="detailRecovery">Keep first-article alignment package attached.</strong>
+          <dl class="recovery-meta">
+            <div><dt>Owner</dt><dd id="detailOwner">Tooling</dd></div>
+            <div><dt>Impact</dt><dd id="detailImpact">0 days</dd></div>
+          </dl>
+        </div>
+        <div class="register-section">
+          <p class="micro">Release Consequence</p>
+          <strong id="detailConsequence">Package remains releaseable for baseline rate.</strong>
+        </div>
+        <div class="register-section">
+          <p class="micro">Datum Lineage</p>
+          <ol class="datum-list" id="datumList"></ol>
+        </div>
+        <div class="register-section event-register">
+          <p class="micro">Plotter Log</p>
+          <ol class="event-log" id="eventLog"></ol>
+        </div>
+      </section>
+
+      <section class="release-memo hidden" id="releaseMemo" aria-label="Release memo">
+        <div class="memo-head">
+          <div>
+            <p class="micro">Static Release Memo</p>
+            <h2 id="memoTitle">Assembly Jig / Datum Continuity</h2>
+          </div>
+          <button type="button" id="printMemo">Print Memo</button>
+        </div>
+        <div class="memo-grid">
+          <section>
+            <p class="micro">Phase</p>
+            <strong id="memoPhase">Baseline / LRIP serviceability scan</strong>
+          </section>
+          <section>
+            <p class="micro">Release State</p>
+            <strong id="memoState">Verified</strong>
+          </section>
+          <section>
+            <p class="micro">Blocked Count</p>
+            <strong id="memoBlocked">01</strong>
+          </section>
+          <section>
+            <p class="micro">Claim</p>
+            <strong id="memoClaim">Tool preserves design datum intent.</strong>
+          </section>
+          <section>
+            <p class="micro">Evidence Method</p>
+            <strong id="memoEvidence">Tracker-frame alignment check against hard-stop baseline.</strong>
+          </section>
+          <section>
+            <p class="micro">Missing Evidence</p>
+            <strong id="memoMissing">No release-blocking evidence gap logged.</strong>
+          </section>
+          <section>
+            <p class="micro">Recovery</p>
+            <strong id="memoRecovery">Keep first-article alignment package attached.</strong>
+          </section>
+          <section>
+            <p class="micro">Owner / Impact</p>
+            <strong id="memoOwnerImpact">Tooling / 0 days</strong>
+          </section>
+          <section>
+            <p class="micro">Release Consequence</p>
+            <strong id="memoConsequence">Package remains releaseable for baseline rate.</strong>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="plate-data.js"></script>
+    <script src="tectonics.js"></script>
+  </body>
+</html>
