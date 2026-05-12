@@ -5,8 +5,9 @@
     return;
   }
 
-  const activeScenario = data.scenarios[data.processMachine.activeScenario];
-  const steps = activeScenario.steps;
+  function currentSteps() {
+    return data.scenarios[data.processMachine.activeScenario].steps;
+  }
 
   const state = {
     selectedToolId: "robot-eoat",
@@ -56,7 +57,8 @@
     qualificationTrigger: document.getElementById("qualificationTrigger"),
     supplyChainRisk: document.getElementById("supplyChainRisk"),
     runMoment: document.getElementById("runMoment"),
-    clearMoment: document.getElementById("clearMoment")
+    clearMoment: document.getElementById("clearMoment"),
+    scenarioPicker: document.getElementById("scenarioPicker")
   };
 
   const statusClass = {
@@ -71,7 +73,7 @@
   }
 
   function activeStep() {
-    return steps[state.activeStepIndex] || steps[0];
+    return currentSteps()[state.activeStepIndex] || currentSteps()[0];
   }
 
   function activeAgent() {
@@ -131,8 +133,8 @@
   function effectiveScore(phaseKey, block, stepIndex) {
     let s = phaseScore(phaseKey, block);
     const upto = typeof stepIndex === "number" ? stepIndex : state.activeStepIndex;
-    for (let i = 0; i <= upto && i < steps.length; i += 1) {
-      const step = steps[i];
+    for (let i = 0; i <= upto && i < currentSteps().length; i += 1) {
+      const step = currentSteps()[i];
       if (step.exposes && step.exposes.includes(block.title)) {
         s = degrade(s);
       }
@@ -253,7 +255,7 @@
 
   function renderSteps() {
     clearChildren(els.stepStack);
-    steps.forEach((step, index) => {
+    currentSteps().forEach((step, index) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "step-button";
@@ -479,7 +481,7 @@
   }
 
   function selectStep(index) {
-    const step = steps[index];
+    const step = currentSteps()[index];
     if (!step) return;
     state.activeStepIndex = index;
     state.selectedToolId = step.toolId;
@@ -491,7 +493,7 @@
   function selectTool(toolId) {
     const tool = byId(toolId);
     const block = blockFor(tool);
-    const matchingStepIndex = steps.findIndex((step) => step.toolId === tool.id);
+    const matchingStepIndex = currentSteps().findIndex((step) => step.toolId === tool.id);
     state.selectedToolId = tool.id;
     state.selectedBlockTitle = block.title;
     state.activeStepIndex = matchingStepIndex >= 0 ? matchingStepIndex : state.activeStepIndex;
@@ -504,7 +506,7 @@
     state.cleared = false;
     selectStep(0);
     state.runTimer = window.setInterval(() => {
-      if (state.activeStepIndex >= steps.length - 1) {
+      if (state.activeStepIndex >= currentSteps().length - 1) {
         window.clearInterval(state.runTimer);
         state.runTimer = null;
         return;
@@ -520,13 +522,45 @@
     renderSelection();
   }
 
+  function populateScenarioPicker() {
+    if (!els.scenarioPicker) return;
+    clearChildren(els.scenarioPicker);
+    Object.entries(data.scenarios).forEach(([key, scenario]) => {
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = scenario.label || key;
+      if (key === data.processMachine.activeScenario) option.selected = true;
+      els.scenarioPicker.appendChild(option);
+    });
+  }
+
+  function switchScenario(name) {
+    if (!data.scenarios[name]) return;
+    data.processMachine.activeScenario = name;
+    if (state.runTimer) {
+      window.clearInterval(state.runTimer);
+      state.runTimer = null;
+    }
+    state.cleared = false;
+    state.activeStepIndex = Math.min(1, currentSteps().length - 1);
+    const step = currentSteps()[state.activeStepIndex];
+    state.selectedToolId = step.toolId;
+    state.selectedBlockTitle = step.blockTitle;
+    renderSteps();
+    renderSelection();
+  }
+
   document.querySelectorAll(".map-node").forEach((button) => {
     button.addEventListener("click", () => selectTool(button.dataset.tool));
   });
 
   els.runMoment.addEventListener("click", runMoment);
   els.clearMoment.addEventListener("click", clearMoment);
+  if (els.scenarioPicker) {
+    els.scenarioPicker.addEventListener("change", (e) => switchScenario(e.target.value));
+  }
 
+  populateScenarioPicker();
   renderSteps();
   renderSelection();
 })();

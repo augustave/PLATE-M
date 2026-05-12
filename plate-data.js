@@ -632,7 +632,7 @@
 
   scenarios: {
     surge_baseline: {
-      label: "Surge baseline path",
+      label: "Surge baseline",
       description: "Default scripted path: ingest → surge exposure → recovery → review.",
       steps: [
         {
@@ -700,6 +700,78 @@
           action: "Prepare executive release memo with one remaining blocker.",
           exposes: [],
           unlocks: ["Certification / Drift Limits"]
+        }
+      ]
+    },
+    supplier_substitution: {
+      label: "Supplier substitution",
+      description: "Precision bushing vendor delivers off-spec stock. Drill/rivet jig wear plan and tolerance package degrade before alt vendor can be qualified.",
+      steps: [
+        {
+          state: "Ingest",
+          phase: "baseline",
+          agent: "release-agent",
+          toolId: "drill-jig",
+          blockTitle: "Drill/Rivet Jig / Wear Bushings",
+          event: "Baseline package ingested. Bushing budget and replacement criteria current.",
+          action: "Keep current supplier package attached.",
+          exposes: [],
+          unlocks: []
+        },
+        {
+          state: "Assess",
+          phase: "surge",
+          agent: "tooling-agent",
+          toolId: "drill-jig",
+          blockTitle: "Drill/Rivet Jig / Wear Bushings",
+          event: "Vendor flags imminent shortage on D5-B bushings; line burns through buffer.",
+          action: "Open alt-vendor qualification queue and protect existing inventory.",
+          exposes: ["Drill/Rivet Jig / Wear Bushings", "Drill/Rivet Jig / Bushing Budget"],
+          unlocks: []
+        },
+        {
+          state: "Expose",
+          phase: "surge",
+          agent: "tooling-agent",
+          toolId: "drill-jig",
+          blockTitle: "Drill/Rivet Jig / Bushing Budget",
+          event: "Hole-position stack consumes wear allowance; downstream tolerance budget contracts.",
+          action: "Hold drill-jig release and reduce replacement interval.",
+          exposes: ["Maintenance / Wear Surfaces"],
+          unlocks: []
+        },
+        {
+          state: "Recover",
+          phase: "recovery",
+          agent: "tooling-agent",
+          toolId: "drill-jig",
+          blockTitle: "Drill/Rivet Jig / Wear Bushings",
+          event: "Alt vendor qualified on partial run; bushing supply restored at reduced cadence.",
+          action: "Attach alt-vendor qualification record.",
+          exposes: [],
+          unlocks: ["Drill/Rivet Jig / Wear Bushings"]
+        },
+        {
+          state: "Review",
+          phase: "review",
+          agent: "metrology-agent",
+          toolId: "drill-jig",
+          blockTitle: "Drill/Rivet Jig / Bushing Budget",
+          event: "Hole-position stack re-baselined under new bushing tolerance.",
+          action: "Re-attach hole-position stack update.",
+          exposes: [],
+          unlocks: ["Drill/Rivet Jig / Bushing Budget"]
+        },
+        {
+          state: "Review",
+          phase: "review",
+          agent: "release-agent",
+          toolId: "cert-record",
+          blockTitle: "Certification / Release Record",
+          event: "Release record updated with alt vendor requalification path.",
+          action: "Sign updated release memo.",
+          exposes: [],
+          unlocks: ["Maintenance / Wear Surfaces"]
         }
       ]
     }

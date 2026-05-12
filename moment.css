@@ -1147,3 +1147,15 @@ h1 {
   color: var(--frame-secondary);
   font-style: italic;
 }
+
+/* ---- Scenario picker ---- */
+
+#scenarioPicker {
+  background: var(--instrument);
+  border: 1px solid var(--frame);
+  color: var(--frame);
+  font: inherit;
+  font-size: 12px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
