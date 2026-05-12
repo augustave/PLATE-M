@@ -654,7 +654,7 @@
           blockTitle: "Robot EOAT / Collision Envelope",
           event: "Surge takt exposes EOAT path conflict against drill/rivet access envelope.",
           action: "Hold robot-mounted release until collision sweep is repeated.",
-          exposes: ["Robot EOAT / Collision Envelope", "Robot EOAT / Grip Margin"],
+          exposes: ["Robot EOAT / Collision Envelope", "Robot EOAT / Grip Margin", "Robot EOAT / TCP Certification"],
           unlocks: []
         },
         {
